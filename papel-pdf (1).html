@@ -1,0 +1,1114 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+  :root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<title>Papel PDF</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+  /* Diseño: porcelana fría y azul tinta, con detalles en latón. Barra azul fija arriba con la acción principal;
+     editor en grupos separados por filetes finos a la izquierda y hojas de vista previa a la derecha. */
+  :root {
+    --bg: #f2f3f6;
+    --surface: #ffffff;
+    --field: #f7f8fa;
+    --tray: #e3e6ec;
+    --fg: #151b2c;
+    --muted: #5b6377;
+    --line: #dde0e7;
+    --gold: #86622a;
+    --focus: #86622a;
+    --sel-bg: #1b2a4e;
+    --sel-fg: #f4f1e8;
+    --bar: #141c33;
+    --bar-fg: #f4f1e8;
+    --bar-muted: #aab3c9;
+    --bar-line: rgba(201, 164, 92, 0.4);
+    --btn-bg: #c9a45c;
+    --btn-fg: #141c33;
+    --danger: #b42318;
+    --bar-danger: #ff9b92;
+    --shadow: rgba(21, 27, 44, 0.2);
+    --display: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+    --body: "Figtree", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+    --barh: 68px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0b101c;
+      --surface: #121a2b;
+      --field: #0e1423;
+      --tray: #070b13;
+      --fg: #e8ebf2;
+      --muted: #98a2b8;
+      --line: #222c43;
+      --gold: #d6b36e;
+      --focus: #d6b36e;
+      --sel-bg: #d6b36e;
+      --sel-fg: #1a1405;
+      --bar: #080c15;
+      --bar-fg: #f4f1e8;
+      --bar-muted: #98a2b8;
+      --bar-line: rgba(214, 179, 110, 0.32);
+      --btn-bg: #d6b36e;
+      --btn-fg: #141c33;
+      --danger: #f97066;
+      --bar-danger: #ff9b92;
+      --shadow: rgba(0, 0, 0, 0.6);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b101c;
+    --surface: #121a2b;
+    --field: #0e1423;
+    --tray: #070b13;
+    --fg: #e8ebf2;
+    --muted: #98a2b8;
+    --line: #222c43;
+    --gold: #d6b36e;
+    --focus: #d6b36e;
+    --sel-bg: #d6b36e;
+    --sel-fg: #1a1405;
+    --bar: #080c15;
+    --bar-fg: #f4f1e8;
+    --bar-muted: #98a2b8;
+    --bar-line: rgba(214, 179, 110, 0.32);
+    --btn-bg: #d6b36e;
+    --btn-fg: #141c33;
+    --danger: #f97066;
+    --bar-danger: #ff9b92;
+    --shadow: rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    z-index: 10;
+    background: var(--bar);
+  }
+  .vh {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  button { font: inherit; }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  /* Barra superior */
+  .bar {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 11;
+    background: var(--bar);
+    color: var(--bar-fg);
+    border-bottom: 1px solid var(--bar-line);
+  }
+  .bar-in {
+    max-width: 1180px;
+    margin: 0 auto;
+    min-height: var(--barh);
+    padding-block: 10px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .brand svg { flex: none; color: var(--btn-bg); }
+  .brand h1 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1;
+    letter-spacing: 0.01em;
+  }
+  .brand span {
+    padding-left: 12px;
+    border-left: 1px solid var(--bar-line);
+    color: var(--bar-muted);
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .actions { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  #status { color: var(--bar-muted); font-size: 13.5px; text-align: right; min-width: 0; }
+  #status.err { color: var(--bar-danger); }
+  .primary {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 10px 20px;
+    border: 0; border-radius: 2px;
+    background: var(--btn-bg); color: var(--btn-fg);
+    font-weight: 600; font-size: 14.5px; letter-spacing: 0.03em;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .primary:hover:not(:disabled) { filter: brightness(1.07); }
+  .primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .primary:focus-visible { outline: 2px solid var(--bar-fg); outline-offset: 3px; }
+  .primary svg { flex: none; }
+
+  /* Contenido */
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding-block: 0 56px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .intro { padding-block: 44px 28px; }
+  .intro::before {
+    content: ""; display: block; width: 44px; height: 2px; background: var(--gold); margin-bottom: 18px;
+  }
+  .intro h2 {
+    margin: 0;
+    max-width: 22ch;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.05;
+    letter-spacing: -0.005em;
+    text-wrap: balance;
+  }
+  .intro p { margin: 14px 0 0; max-width: 54ch; color: var(--muted); font-size: 16px; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+  .editor {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    min-width: 0;
+  }
+  .grp { padding: 26px 26px 28px; display: grid; gap: 20px; min-width: 0; }
+  .grp + .grp { border-top: 1px solid var(--line); }
+  .grp > h3 {
+    margin: 0;
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 25px;
+    line-height: 1.1;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .grp > h3::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  .field { display: grid; gap: 7px; min-width: 0; }
+  .lbl, legend {
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0;
+  }
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: grid; gap: 7px; }
+  input[type="text"], input[type="number"], textarea {
+    width: 100%;
+    background: var(--field);
+    color: var(--fg);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 10px 12px;
+    font: inherit;
+  }
+  input[type="text"]:focus, input[type="number"]:focus, textarea:focus {
+    outline: none; border-color: var(--focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 22%, transparent);
+  }
+  input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.7; }
+  input[type="number"] { font-variant-numeric: tabular-nums; padding: 8px 10px; }
+  textarea {
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.65;
+    min-height: 320px;
+    resize: vertical;
+  }
+
+  .samples { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .samples .lbl { margin-right: 6px; }
+  .chip {
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 6px 14px;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .chip:hover { border-color: var(--gold); color: var(--gold); }
+
+  .fmt { display: flex; align-items: center; gap: 6px; }
+  .fmt-t { font-size: 13.5px; color: var(--muted); margin-right: 6px; }
+  .ibtn {
+    width: 34px; height: 34px; display: inline-grid; place-items: center;
+    background: var(--field); color: var(--fg);
+    border: 1px solid var(--line); border-radius: 2px; cursor: pointer;
+  }
+  .ibtn:hover { border-color: var(--gold); color: var(--gold); }
+
+  details {
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    background: var(--field);
+    padding: 9px 14px;
+  }
+  summary { cursor: pointer; font-weight: 500; font-size: 14px; }
+  .syntax {
+    list-style: none; margin: 12px 0 2px; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 8px 18px;
+    font-size: 14px; color: var(--muted);
+  }
+  .syntax code {
+    font-family: var(--mono); font-size: 12.5px;
+    color: var(--fg);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 1px 6px;
+    margin-right: 6px;
+  }
+
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 22px 24px; }
+  .seg { position: relative; display: flex; border: 1px solid var(--line); border-radius: 2px; overflow: hidden; background: var(--field); }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg label {
+    flex: 1; text-align: center; padding: 8px 6px; font-size: 14px; font-weight: 500; cursor: pointer;
+  }
+  .seg label:not(:first-of-type) { border-left: 1px solid var(--line); }
+  .seg input:checked + label { background: var(--sel-bg); color: var(--sel-fg); }
+  .seg input:focus-visible + label { outline: 2px solid var(--focus); outline-offset: -3px; }
+
+  .sw { display: flex; gap: 14px; padding-block: 4px; }
+  .sw input { position: absolute; opacity: 0; pointer-events: none; }
+  .sw label {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--c); cursor: pointer; position: relative;
+  }
+  .sw input:checked + label { box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--fg); }
+  .sw input:focus-visible + label { outline: 2px solid var(--focus); outline-offset: 5px; }
+
+  .rng { display: flex; align-items: center; gap: 14px; }
+  .rng input[type="range"] { flex: 1; min-width: 0; accent-color: var(--gold); }
+  .rng output { font-variant-numeric: tabular-nums; min-width: 4.5ch; text-align: right; font-weight: 500; }
+  .check { display: flex; align-items: center; gap: 10px; font-size: 15px; }
+  .check input { width: 18px; height: 18px; accent-color: var(--gold); }
+  #note { color: var(--muted); font-size: 13.5px; margin: 0; }
+
+  .mgn { grid-column: 1 / -1; gap: 12px; }
+  .mgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
+  .mgrid label { display: grid; gap: 5px; font-size: 13.5px; color: var(--muted); }
+  .hint { margin: 0; font-size: 13.5px; color: var(--muted); }
+  .hint.err { color: var(--danger); }
+
+  /* Marca de agua */
+  .wm-file { display: flex; align-items: center; gap: 16px; min-width: 0; }
+  .wm-thumb {
+    flex: none; width: 76px; height: 76px; border-radius: 2px;
+    border: 1px dashed var(--line); background: var(--field);
+    display: grid; place-items: center; overflow: hidden;
+  }
+  .wm-thumb img { max-width: 100%; max-height: 100%; display: block; }
+  .wm-info { display: grid; gap: 10px; min-width: 0; }
+  #wmname { font-size: 14.5px; font-weight: 500; overflow-wrap: anywhere; }
+  .wm-btns { position: relative; display: flex; flex-wrap: wrap; gap: 8px; }
+  .wm-btns input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .wm-btns input:focus-visible + label { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .wm-btns label.chip { display: inline-block; }
+  .opts.off { opacity: 0.45; }
+
+  /* Vista previa */
+  .preview { min-width: 0; }
+  .pv-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+  .pv-head h2 { margin: 0; font-family: var(--display); font-size: 27px; font-weight: 600; line-height: 1.1; }
+  #count { color: var(--muted); font-size: 13.5px; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+  #pages { background: var(--tray); border-radius: 2px; padding: 22px; display: grid; gap: 22px; }
+  .sheet { margin: 0; }
+  .sheet canvas {
+    display: block; width: 100%; height: auto; background: #ffffff;
+    box-shadow: 0 1px 2px var(--shadow), 0 10px 28px var(--shadow);
+  }
+  .sheet figcaption { margin-top: 8px; text-align: center; font-size: 12px; letter-spacing: 0.08em; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .foot { margin: 28px 0 0; color: var(--muted); font-size: 13px; text-align: center; }
+
+  @media (min-width: 861px) {
+    .preview {
+      position: sticky;
+      top: calc(var(--barh) + env(safe-area-inset-top, 0px) + 16px);
+      max-height: calc(100vh - var(--barh) - env(safe-area-inset-top, 0px) - 32px);
+      overflow: auto;
+    }
+  }
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: minmax(0, 1fr); }
+    .brand span { display: none; }
+    .intro { padding-block: 32px 22px; }
+  }
+  @media (max-width: 860px) {
+    /* 16px evita que iOS acerque la pantalla al tocar un campo */
+    input[type="text"], input[type="number"], textarea { font-size: 16px; }
+    .syntax { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (pointer: coarse) {
+    .sw label { width: 34px; height: 34px; }
+    .ibtn { width: 40px; height: 40px; }
+    .seg label { padding-block: 11px; }
+    .chip { padding-block: 9px; }
+  }
+  @media (max-width: 400px) {
+    .brand svg { display: none; }
+    .primary { padding: 9px 12px; gap: 7px; }
+  }
+  @media (max-width: 560px) {
+    #status { display: none; }
+    .grp { padding: 22px 18px 24px; }
+    .brand h1 { font-size: 26px; }
+    .primary { padding: 9px 14px; }
+    #pages { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+
+
+<header class="bar">
+  <div class="bar-in">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5h9.5L21 8v15.5H6z"/><path d="M15.5 2.5V8H21"/><path d="M10 14h7M10 18h5" stroke-linecap="round"/></svg>
+      <h1>Papel PDF</h1><span>Texto a PDF</span>
+    </div>
+    <div class="actions">
+      <span id="status" role="status" aria-live="polite"></span>
+      <button id="dl" class="primary" type="button" disabled>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8M4.5 7 8 10.5 11.5 7M3 13.5h10"/></svg>
+        Descargar PDF
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <h2>Tu documento, con identidad propia</h2>
+    <p>Escribe el texto, ajusta la página y añade tu sello. La hoja de la derecha es lo que se descarga.</p>
+  </div>
+
+  <div class="grid">
+    <section class="editor" aria-label="Editor del documento">
+
+      <div class="grp">
+        <h3>Documento</h3>
+        <div class="samples">
+          <span class="lbl">Cargar ejemplo</span>
+          <button class="chip" type="button" data-sample="cotizacion">Cotización</button>
+          <button class="chip" type="button" data-sample="carta">Carta</button>
+          <button class="chip" type="button" data-sample="apuntes">Apuntes</button>
+        </div>
+        <div class="field">
+          <label class="lbl" for="title">Título</label>
+          <input id="title" type="text" autocomplete="off" placeholder="Por ejemplo: Informe mensual">
+        </div>
+        <div class="field">
+          <label class="lbl" for="sub">Subtítulo o autor</label>
+          <input id="sub" type="text" autocomplete="off" placeholder="Nombre, fecha o descripción corta">
+        </div>
+        <div class="field">
+          <label class="lbl" for="body">Contenido</label>
+          <div class="fmt" role="group" aria-label="Alinear el texto seleccionado">
+            <span class="fmt-t">Alinear selección</span>
+            <button class="ibtn" type="button" data-align="i" title="Izquierda" aria-label="Alinear a la izquierda"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 4h14M2 8h9M2 12h14M2 16h9"/></svg></button>
+            <button class="ibtn" type="button" data-align="c" title="Centro" aria-label="Centrar"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 4h14M4.5 8h9M2 12h14M4.5 16h9"/></svg></button>
+            <button class="ibtn" type="button" data-align="d" title="Derecha" aria-label="Alinear a la derecha"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 4h14M7 8h9M2 12h14M7 16h9"/></svg></button>
+          </div>
+          <textarea id="body" spellcheck="true" lang="es" placeholder="Escribe aquí. Cada línea es un párrafo."></textarea>
+          <details>
+            <summary>Cómo dar formato</summary>
+            <ul class="syntax">
+              <li><code># Texto</code>título grande</li>
+              <li><code>## Texto</code>subtítulo</li>
+              <li><code>- Texto</code>viñeta</li>
+              <li><code>1. Texto</code>lista numerada</li>
+              <li><code>[c] Texto</code>centrado (<code>[d]</code> derecha); no aplica a listas</li>
+              <li><code>---</code>línea separadora</li>
+              <li><code>===</code>empezar página nueva</li>
+            </ul>
+          </details>
+        </div>
+      </div>
+
+      <div class="grp">
+        <h3>Página</h3>
+        <div class="opts">
+          <fieldset>
+            <legend>Hoja</legend>
+            <div class="seg">
+              <input type="radio" name="size" id="size-a4" value="a4" checked><label for="size-a4">A4</label>
+              <input type="radio" name="size" id="size-letter" value="letter"><label for="size-letter">Carta</label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Tipografía</legend>
+            <div class="seg">
+              <input type="radio" name="font" id="font-sans" value="helvetica" checked><label for="font-sans">Sans</label>
+              <input type="radio" name="font" id="font-serif" value="times"><label for="font-serif">Serif</label>
+              <input type="radio" name="font" id="font-mono" value="courier"><label for="font-mono">Mono</label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Alinear título y subtítulo</legend>
+            <div class="seg">
+              <input type="radio" name="halign" id="ha-left" value="left" checked><label for="ha-left">Izquierda</label>
+              <input type="radio" name="halign" id="ha-center" value="center"><label for="ha-center">Centro</label>
+              <input type="radio" name="halign" id="ha-right" value="right"><label for="ha-right">Derecha</label>
+            </div>
+          </fieldset>
+          <div class="field">
+            <label class="lbl" for="pt">Tamaño de letra</label>
+            <div class="rng"><input id="pt" type="range" min="10" max="14" step="0.5" value="11"><output id="ptv" for="pt">11 pt</output></div>
+          </div>
+          <fieldset>
+            <legend>Color de acento</legend>
+            <div class="sw">
+              <input type="radio" name="accent" id="c1" value="#1b2a4e" checked><label for="c1" style="--c:#1b2a4e"><span class="vh">Azul marino</span></label>
+              <input type="radio" name="accent" id="c2" value="#86622a"><label for="c2" style="--c:#86622a"><span class="vh">Latón</span></label>
+              <input type="radio" name="accent" id="c3" value="#7a1f35"><label for="c3" style="--c:#7a1f35"><span class="vh">Burdeos</span></label>
+              <input type="radio" name="accent" id="c4" value="#1f4d3f"><label for="c4" style="--c:#1f4d3f"><span class="vh">Verde bosque</span></label>
+              <input type="radio" name="accent" id="c5" value="#2b3640"><label for="c5" style="--c:#2b3640"><span class="vh">Grafito</span></label>
+            </div>
+          </fieldset>
+          <div class="field">
+            <span class="lbl">Números</span>
+            <label class="check" for="nums"><input id="nums" type="checkbox" checked>Numerar páginas</label>
+          </div>
+          <fieldset class="mgn">
+            <legend>Márgenes de la página</legend>
+            <div class="rng"><input id="mall" type="range" min="5" max="50" step="1" value="20" aria-label="Margen en los cuatro lados"><output id="mallv" for="mall">20 mm</output></div>
+            <div class="mgrid">
+              <label for="mt">Arriba<input id="mt" type="number" min="5" max="60" step="1" value="20" inputmode="decimal"></label>
+              <label for="mr">Derecha<input id="mr" type="number" min="5" max="60" step="1" value="20" inputmode="decimal"></label>
+              <label for="mb">Abajo<input id="mb" type="number" min="5" max="60" step="1" value="20" inputmode="decimal"></label>
+              <label for="ml">Izquierda<input id="ml" type="number" min="5" max="60" step="1" value="20" inputmode="decimal"></label>
+            </div>
+            <p class="hint">El deslizador cambia los cuatro lados. Luego ajusta cada lado en milímetros.</p>
+          </fieldset>
+        </div>
+        <p id="note" hidden></p>
+      </div>
+
+      <div class="grp wm">
+        <h3>Marca de agua</h3>
+        <div class="wm-file">
+          <div class="wm-thumb"><img id="wmthumb" alt="Vista de la marca de agua" hidden></div>
+          <div class="wm-info">
+            <span id="wmname">Sin imagen</span>
+            <div class="wm-btns">
+              <input id="wmfile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml">
+              <label for="wmfile" class="chip" id="wmpick">Elegir imagen</label>
+              <button id="wmclear" class="chip" type="button" hidden>Quitar</button>
+            </div>
+          </div>
+        </div>
+        <p id="wmmsg" class="hint">Sube un logo o sello (PNG, JPG, WebP o SVG). Se imprime detrás del texto en todas las páginas.</p>
+        <div class="opts off" id="wmopts">
+          <fieldset>
+            <legend>Posición</legend>
+            <div class="seg">
+              <input type="radio" name="wmpos" id="wmp-center" value="center" checked disabled><label for="wmp-center">Centro</label>
+              <input type="radio" name="wmpos" id="wmp-corner" value="corner" disabled><label for="wmp-corner">Esquina</label>
+              <input type="radio" name="wmpos" id="wmp-tile" value="tile" disabled><label for="wmp-tile">Mosaico</label>
+            </div>
+          </fieldset>
+          <div class="field">
+            <label class="lbl" for="wmop">Opacidad</label>
+            <div class="rng"><input id="wmop" type="range" min="5" max="60" step="5" value="15" disabled><output id="wmopv" for="wmop">15%</output></div>
+          </div>
+          <div class="field">
+            <label class="lbl" for="wmsize">Tamaño</label>
+            <div class="rng"><input id="wmsize" type="range" min="10" max="100" step="5" value="60" disabled><output id="wmsizev" for="wmsize">60%</output></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="preview" aria-label="Vista previa">
+      <div class="pv-head"><h2>Vista previa</h2><span id="count"></span></div>
+      <div id="pages"></div>
+    </section>
+  </div>
+
+  <p class="foot">Todo se procesa en tu navegador. Tu texto y tus imágenes no se envían a ningún servidor.</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>window.jspdf||document.write('<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"><\/script>');</script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var PT = 0.3528; // milímetros por punto
+  var SIZES = { a4: [210, 297], letter: [215.9, 279.4] };
+  var FONT_CSS = {
+    helvetica: 'Helvetica, Arial, "Liberation Sans", sans-serif',
+    times: '"Times New Roman", Times, "Liberation Serif", serif',
+    courier: '"Courier New", Courier, "Liberation Mono", monospace'
+  };
+  var INK = '#1b232b', MUTED = '#5d6873', RULE = '#c8d0d7';
+  var DRAFT_KEY = 'papel-pdf-borrador';
+
+  var SAMPLES = {
+    cotizacion: {
+      title: 'Cotización de servicios',
+      sub: 'Documento de ejemplo · 20 de octubre de 2026',
+      body: [
+        '# Resumen',
+        'Esta cotización describe los servicios solicitados, el valor de cada uno y las condiciones de pago. Los precios están en pesos colombianos (COP) e incluyen IVA.',
+        '',
+        '## Servicios incluidos',
+        '- Diseño de logotipo con tres propuestas iniciales: $450.000',
+        '- Manual de marca en PDF de 12 páginas: $380.000',
+        '- Tarjetas de presentación con arte listo para imprimir: $120.000',
+        '',
+        '## Total',
+        'Valor total del proyecto: $950.000',
+        '',
+        '---',
+        '',
+        '## Condiciones',
+        '1. Se requiere un anticipo del 50% para iniciar el trabajo.',
+        '2. El saldo se paga contra entrega de los archivos finales.',
+        '3. Incluye dos rondas de ajustes. Los cambios adicionales se cotizan aparte.',
+        '4. Esta cotización tiene una validez de 15 días.',
+        '',
+        'Para aceptar, responde a este documento con la palabra "Aprobado".'
+      ].join('\n')
+    },
+    carta: {
+      title: '',
+      sub: '',
+      body: [
+        'Ciudad, 20 de octubre de 2026',
+        '',
+        'Señores',
+        '[Nombre de la empresa]',
+        'Atención: [Nombre del destinatario]',
+        '',
+        '## Asunto: Solicitud de información',
+        '',
+        'Cordial saludo,',
+        '',
+        'Me dirijo a ustedes para solicitar información sobre los servicios que ofrecen, sus tarifas y los tiempos de entrega. Estoy interesado en una propuesta ajustada a mis necesidades.',
+        '',
+        'Agradezco su atención y quedo atento a su respuesta.',
+        '',
+        'Atentamente,',
+        '',
+        '[Tu nombre]',
+        '[Teléfono] · [Correo electrónico]'
+      ].join('\n')
+    },
+    apuntes: {
+      title: 'Apuntes de clase',
+      sub: 'Unidad 3 · Ejemplo',
+      body: [
+        '# Conceptos clave',
+        '- La idea principal va primero, el detalle después.',
+        '- Cada apartado resume una sola clase.',
+        '- Los ejemplos ayudan a recordar mejor que las definiciones.',
+        '',
+        '# Para repasar antes del examen',
+        '1. Leer de nuevo los subrayados.',
+        '2. Resolver los ejercicios de la guía.',
+        '3. Explicar cada tema en voz alta, con tus palabras.',
+        '',
+        '---',
+        '',
+        '## Pendientes',
+        'Preguntar al profesor por las fechas de entrega y por el formato del trabajo final.'
+      ].join('\n')
+    }
+  };
+
+  var inViewer = !!(window.claude && window.claude.use);
+  var jsPDFCtor = window.jspdf && window.jspdf.jsPDF;
+  var measureDoc = null;
+  var downloads = null;
+  var replaced = 0;
+  var lastRes = null, lastOpts = null;
+
+  function val(name) { return document.querySelector('input[name="' + name + '"]:checked').value; }
+  function mm(id) {
+    var v = parseFloat($(id).value);
+    if (isNaN(v)) v = 20;
+    return Math.min(60, Math.max(5, v));
+  }
+  function read() {
+    return {
+      title: $('title').value, sub: $('sub').value, body: $('body').value,
+      size: val('size'), font: val('font'), halign: val('halign'),
+      mg: { t: mm('mt'), r: mm('mr'), b: mm('mb'), l: mm('ml') },
+      accent: val('accent'), pt: +$('pt').value, pageNums: $('nums').checked,
+      wm: { on: !!wm, pos: val('wmpos'), op: +$('wmop').value / 100, size: +$('wmsize').value / 100 }
+    };
+  }
+
+  /* ---------- Marca de agua ---------- */
+  var wm = null; // { canvas, data, ratio, name }
+  var WM_DEFAULT_SIZE = { center: 60, corner: 20, tile: 25 };
+
+  function wmPlace(w, W, H, mr, mb) {
+    var out = [], r = wm.ratio, bw = W * w.size, bh = bw * r;
+    if (bh > H * 0.9) { bh = H * 0.9; bw = bh / r; }
+    function add(x, y) { out.push({ t: 'img', x: x, y: y, w: bw, h: bh, a: w.op }); }
+    if (w.pos === 'center') add((W - bw) / 2, (H - bh) / 2);
+    else if (w.pos === 'corner') add(W - bw - mr * 0.6, H - bh - mb * 0.6);
+    else {
+      var sx = bw * 1.7, sy = bh * 1.7, row = 0;
+      for (var yy = 8; yy + bh <= H - 8; yy += sy, row++) {
+        for (var xx = 8 + (row % 2 ? sx / 2 : 0); xx + bw <= W - 8; xx += sx) add(xx, yy);
+      }
+    }
+    return out;
+  }
+  function wmMsg(text, isErr) {
+    var el = $('wmmsg');
+    el.textContent = text; el.classList.toggle('err', !!isErr);
+  }
+  function wmEnable(on) {
+    document.querySelectorAll('#wmopts input').forEach(function (el) { el.disabled = !on; });
+    $('wmopts').classList.toggle('off', !on);
+  }
+  function wmClear() {
+    wm = null;
+    $('wmfile').value = '';
+    $('wmthumb').hidden = true; $('wmthumb').removeAttribute('src');
+    $('wmname').textContent = 'Sin imagen';
+    $('wmclear').hidden = true; $('wmpick').textContent = 'Elegir imagen';
+    wmMsg('Sube un logo o sello (PNG, JPG, WebP o SVG). Se imprime detrás del texto en todas las páginas.');
+    wmEnable(false);
+    update();
+  }
+  function wmLoad(file) {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { wmMsg('La imagen pesa más de 10 MB. Elige una más liviana.', true); return; }
+    var fr = new FileReader();
+    fr.onerror = function () { wmMsg('No se pudo leer ese archivo.', true); };
+    fr.onload = function () {
+      var img = new Image();
+      img.onerror = function () { wmMsg('Ese archivo no parece una imagen válida.', true); };
+      img.onload = function () {
+        var nw = img.naturalWidth || img.width, nh = img.naturalHeight || img.height;
+        if (!nw || !nh) { wmMsg('No se pudo medir la imagen. Prueba con un PNG o JPG.', true); return; }
+        var big = Math.max(nw, nh);
+        var sc = file.type === 'image/svg+xml' ? 1000 / big : Math.min(1, 1000 / big);
+        var cv = document.createElement('canvas');
+        cv.width = Math.max(1, Math.round(nw * sc)); cv.height = Math.max(1, Math.round(nh * sc));
+        cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+        var data;
+        try { data = cv.toDataURL('image/png'); } catch (e) { wmMsg('No se pudo procesar la imagen.', true); return; }
+        wm = { canvas: cv, data: data, ratio: cv.height / cv.width, name: file.name };
+        $('wmthumb').src = data; $('wmthumb').hidden = false;
+        $('wmname').textContent = file.name;
+        $('wmclear').hidden = false; $('wmpick').textContent = 'Cambiar imagen';
+        wmMsg('Ajusta la posición, la opacidad y el tamaño. Una opacidad baja evita que moleste al leer.');
+        wmEnable(true);
+        update();
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  }
+
+  // Las fuentes estándar de PDF solo cubren caracteres latinos; el resto se reemplaza.
+  function clean(s) {
+    return s
+      .replace(/[‘’‛]/g, "'")
+      .replace(/[“”„]/g, '"')
+      .replace(/[–—]/g, '-')
+      .replace(/…/g, '...')
+      .replace(/ /g, ' ')
+      .replace(/\t/g, '    ')
+      .replace(/[^ -~¡-ÿ]/g, function () { replaced++; return '?'; });
+  }
+
+  /* ---------- Maquetación: produce las mismas operaciones para la vista previa y el PDF ---------- */
+  function layout(o) {
+    replaced = 0;
+    if (!measureDoc) measureDoc = new jsPDFCtor({ unit: 'mm', format: 'a4' });
+    var doc = measureDoc;
+    var dims = SIZES[o.size], W = dims[0], H = dims[1];
+    var ml = o.mg.l, mr = o.mg.r, mt = o.mg.t, mb = o.mg.b;
+    if (o.pageNums) mb = Math.max(mb, 12);
+    var cw = Math.max(W - ml - mr, 60), bottom = H - mb;
+    var pages = [[]], y = mt;
+
+    function cur() { return pages[pages.length - 1]; }
+    function newPage() { pages.push([]); y = mt; }
+    function atTop() { return y <= mt + 0.01; }
+    function lh(pt, f) { return pt * PT * f; }
+    function wrap(s, style, pt, w) {
+      doc.setFont(o.font, style); doc.setFontSize(pt);
+      return doc.splitTextToSize(s || ' ', w);
+    }
+    function run(lines, x, style, pt, color, lineH, marker, align, w) {
+      lines.forEach(function (s, i) {
+        if (y + lineH > bottom) newPage();
+        var base = y + lineH / 2 + pt * PT * 0.36;
+        if (i === 0 && marker) marker(base, y, lineH);
+        if (s) {
+          var px = align === 'center' ? x + w / 2 : align === 'right' ? x + w : x;
+          var op = { t: 'text', s: s, x: px, y: base, font: o.font, style: style, pt: pt, color: color };
+          if (align === 'center' || align === 'right') op.align = align;
+          cur().push(op);
+        }
+        y += lineH;
+      });
+    }
+
+    var title = clean(o.title).trim(), sub = clean(o.sub).trim();
+    if (title) { run(wrap(title, 'bold', 26, cw), ml, 'bold', 26, INK, lh(26, 1.2), null, o.halign, cw); y += 1.5; }
+    if (sub) { run(wrap(sub, 'normal', 11, cw), ml, 'normal', 11, MUTED, lh(11, 1.5), null, o.halign, cw); }
+    if (title || sub) {
+      y += 3;
+      var bx = o.halign === 'center' ? ml + cw / 2 - 11 : o.halign === 'right' ? ml + cw - 22 : ml;
+      cur().push({ t: 'rect', x: bx, y: y, w: 22, h: 1.1, color: o.accent });
+      y += 9;
+    }
+
+    var bodyLH = lh(o.pt, 1.5);
+    o.body.split(/\r?\n/).forEach(function (raw) {
+      var line = clean(raw).replace(/\s+$/, ''), t = line.trim(), r, al = 'left';
+      var am = t.match(/^\[([cdi])\]\s?/);
+      if (am) { al = am[1] === 'c' ? 'center' : am[1] === 'd' ? 'right' : 'left'; t = t.slice(am[0].length).trim(); }
+      if (!t) { if (!atTop()) y += o.pt * PT * 0.7; return; }
+      if (/^={3,}$/.test(t)) { if (!atTop()) newPage(); return; }
+      if (/^-{3,}$/.test(t)) {
+        if (y + 6 > bottom) newPage();
+        y += 2.5;
+        cur().push({ t: 'rect', x: ml, y: y, w: cw, h: 0.25, color: RULE });
+        y += 3.5;
+        return;
+      }
+      if ((r = t.match(/^(#{1,2})\s+(.*)$/))) {
+        var big = r[1].length === 1, pt = o.pt * (big ? 1.7 : 1.3), hl = lh(pt, 1.25);
+        var hs = wrap(r[2], 'bold', pt, cw);
+        var need = hs.length * hl + 2 * bodyLH;
+        if (!atTop()) y += pt * PT * (big ? 0.7 : 0.5);
+        if (y + need > bottom) newPage();
+        run(hs, ml, 'bold', pt, big ? o.accent : INK, hl, null, al, cw);
+        y += 1.2;
+        return;
+      }
+      if ((r = t.match(/^[-*•]\s+(.*)$/))) {
+        var ind = 6;
+        run(wrap(r[1], 'normal', o.pt, cw - ind), ml + ind, 'normal', o.pt, INK, bodyLH, function (base, top, l) {
+          cur().push({ t: 'dot', x: ml + 2, y: top + l / 2 + o.pt * PT * 0.05, r: o.pt * PT * 0.13, color: o.accent });
+        });
+        return;
+      }
+      if ((r = t.match(/^(\d+)[.)]\s+(.*)$/))) {
+        var ind2 = 7, num = r[1] + '.';
+        run(wrap(r[2], 'normal', o.pt, cw - ind2), ml + ind2, 'normal', o.pt, INK, bodyLH, function (base) {
+          cur().push({ t: 'text', s: num, x: ml, y: base, font: o.font, style: 'bold', pt: o.pt, color: o.accent });
+        });
+        return;
+      }
+      run(wrap(t, 'normal', o.pt, cw), ml, 'normal', o.pt, INK, bodyLH, null, al, cw);
+    });
+
+    if (o.wm.on && wm) {
+      pages.forEach(function (ops) {
+        wmPlace(o.wm, W, H, mr, mb).reverse().forEach(function (p) { ops.unshift(p); });
+      });
+    }
+    if (o.pageNums) {
+      pages.forEach(function (ops, i) {
+        ops.push({ t: 'text', s: 'Página ' + (i + 1) + ' de ' + pages.length, x: ml + cw / 2, y: H - mb * 0.5, font: o.font, style: 'normal', pt: 9, color: '#7a8590', align: 'center' });
+      });
+    }
+    return { pages: pages, W: W, H: H };
+  }
+
+  /* ---------- PDF ---------- */
+  function rgb(hex) { var n = parseInt(hex.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+  function buildPDF(res, o) {
+    var doc = new jsPDFCtor({ unit: 'mm', format: o.size === 'a4' ? 'a4' : 'letter', compress: true });
+    doc.setProperties({ title: o.title.trim() || 'Documento' });
+    res.pages.forEach(function (ops, i) {
+      if (i) doc.addPage();
+      ops.forEach(function (op) {
+        var c = op.color ? rgb(op.color) : null;
+        if (op.t === 'img') {
+          if (!wm) return;
+          doc.saveGraphicsState();
+          doc.setGState(new doc.GState({ opacity: op.a }));
+          doc.addImage(wm.data, 'PNG', op.x, op.y, op.w, op.h, 'wm', 'FAST');
+          doc.restoreGraphicsState();
+        } else if (op.t === 'text') {
+          doc.setFont(op.font, op.style); doc.setFontSize(op.pt); doc.setTextColor(c[0], c[1], c[2]);
+          if (op.align) doc.text(op.s, op.x, op.y, { align: op.align }); else doc.text(op.s, op.x, op.y);
+        } else if (op.t === 'rect') {
+          doc.setFillColor(c[0], c[1], c[2]); doc.rect(op.x, op.y, op.w, op.h, 'F');
+        } else if (op.t === 'dot') {
+          doc.setFillColor(c[0], c[1], c[2]); doc.circle(op.x, op.y, op.r, 'F');
+        }
+      });
+    });
+    return doc;
+  }
+
+  /* ---------- Vista previa en canvas ---------- */
+  function paint(canvas, ops, W, H, cssW) {
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssW * H / W * dpr);
+    var k = canvas.width / W, ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ops.forEach(function (op) {
+      if (op.color) ctx.fillStyle = op.color;
+      if (op.t === 'img') {
+        if (!wm) return;
+        ctx.globalAlpha = op.a;
+        ctx.drawImage(wm.canvas, op.x * k, op.y * k, op.w * k, op.h * k);
+        ctx.globalAlpha = 1;
+      } else if (op.t === 'text') {
+        ctx.font = (op.style === 'bold' ? '700 ' : '400 ') + (op.pt * PT * k) + 'px ' + FONT_CSS[op.font];
+        ctx.textBaseline = 'alphabetic';
+        ctx.textAlign = op.align || 'left';
+        ctx.fillText(op.s, op.x * k, op.y * k);
+      } else if (op.t === 'rect') {
+        ctx.fillRect(op.x * k, op.y * k, op.w * k, op.h * k);
+      } else if (op.t === 'dot') {
+        ctx.beginPath(); ctx.arc(op.x * k, op.y * k, Math.max(op.r * k, 1), 0, Math.PI * 2); ctx.fill();
+      }
+    });
+  }
+
+  function renderPreview() {
+    if (!lastRes) return;
+    var box = $('pages'), n = lastRes.pages.length;
+    while (box.children.length > n) box.lastChild.remove();
+    while (box.children.length < n) {
+      var fig = document.createElement('figure');
+      fig.className = 'sheet';
+      fig.innerHTML = '<canvas role="img"></canvas><figcaption></figcaption>';
+      box.appendChild(fig);
+    }
+    var w = Math.max(box.clientWidth - 32, 200);
+    lastRes.pages.forEach(function (ops, i) {
+      var fig = box.children[i], cv = fig.querySelector('canvas');
+      cv.setAttribute('aria-label', 'Página ' + (i + 1) + ' de ' + n);
+      fig.querySelector('figcaption').textContent = (i + 1) + ' / ' + n;
+      paint(cv, ops, lastRes.W, lastRes.H, w);
+    });
+    $('count').textContent = n + (n === 1 ? ' página' : ' páginas');
+  }
+
+  /* ---------- Estado de la barra y del botón ---------- */
+  function hasContent(o) { return (o.title + o.sub + o.body).trim().length > 0; }
+  function refreshAction() {
+    var btn = $('dl'), st = $('status'), o = lastOpts;
+    st.classList.remove('err');
+    if (!jsPDFCtor) { btn.disabled = true; st.textContent = 'No se pudo cargar el generador de PDF.'; st.classList.add('err'); return; }
+    if (!downloads) { btn.disabled = true; st.textContent = downloads === undefined ? 'Preparando descarga…' : 'La descarga no está disponible en esta vista.'; return; }
+    if (o && !hasContent(o)) { btn.disabled = true; st.textContent = 'Escribe algo para crear el PDF.'; return; }
+    btn.disabled = false;
+    if (!st.dataset.keep) st.textContent = '';
+  }
+  function say(msg, isErr) {
+    var st = $('status');
+    st.textContent = msg; st.classList.toggle('err', !!isErr);
+    st.dataset.keep = '1';
+    clearTimeout(say.t);
+    say.t = setTimeout(function () { delete st.dataset.keep; refreshAction(); }, 4000);
+  }
+
+  /* ---------- Actualización ---------- */
+  var raf = 0, saveT = 0;
+  function update() {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(function () {
+      if (!jsPDFCtor) { refreshAction(); return; }
+      var o = read();
+      lastOpts = o;
+      lastRes = layout(o);
+      renderPreview();
+      var note = $('note');
+      if (replaced > 0) {
+        note.hidden = false;
+        note.textContent = replaced + (replaced === 1 ? ' símbolo (por ejemplo un emoji) no existe' : ' símbolos (por ejemplo emojis) no existen') + ' en las fuentes del PDF y se mostrará como "?".';
+      } else { note.hidden = true; }
+      refreshAction();
+    });
+    clearTimeout(saveT);
+    saveT = setTimeout(function () {
+      try {
+        var o = read();
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(o));
+      } catch (e) {}
+    }, 400);
+  }
+
+  function slug(s) {
+    var t = s.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return t || 'documento';
+  }
+
+  async function download() {
+    if (!downloads || !jsPDFCtor) return;
+    var o = read();
+    if (!hasContent(o)) return;
+    var btn = $('dl');
+    btn.disabled = true;
+    try {
+      var res = layout(o);
+      var buf = buildPDF(res, o).output('arraybuffer');
+      await downloads.save({ filename: slug(o.title) + '.pdf', data: buf });
+      say(inViewer ? 'PDF guardado.' : 'Descarga iniciada. Revisa tus descargas.');
+    } catch (e) {
+      if (e && e.code === 'declined') say('Descarga cancelada.');
+      else say('No se pudo guardar el PDF. Inténtalo de nuevo.', true);
+    }
+    refreshAction();
+  }
+
+  /* ---------- Arranque ---------- */
+  function apply(d) {
+    if (typeof d.title === 'string') $('title').value = d.title;
+    if (typeof d.sub === 'string') $('sub').value = d.sub;
+    if (typeof d.body === 'string') $('body').value = d.body;
+  }
+  function setRadio(name, v) {
+    var el = document.querySelector('input[name="' + name + '"][value="' + v + '"]');
+    if (el) el.checked = true;
+  }
+
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || 'null'); } catch (e) {}
+  if (saved && typeof saved.body === 'string') {
+    apply(saved);
+    setRadio('size', saved.size); setRadio('font', saved.font); setRadio('halign', saved.halign); setRadio('accent', saved.accent);
+    if (saved.mg) { ['t', 'r', 'b', 'l'].forEach(function (k) { if (saved.mg[k]) $('m' + k).value = saved.mg[k]; }); }
+    if (!document.querySelector('input[name="accent"]:checked')) $('c1').checked = true;
+    if (saved.pt) $('pt').value = saved.pt;
+    if (typeof saved.pageNums === 'boolean') $('nums').checked = saved.pageNums;
+  } else {
+    apply(SAMPLES.cotizacion);
+  }
+  $('ptv').textContent = $('pt').value + ' pt';
+
+  document.querySelectorAll('.editor input, .editor textarea').forEach(function (el) {
+    el.addEventListener('input', function () {
+      if (el.id === 'pt') $('ptv').textContent = el.value + ' pt';
+      if (el.id === 'mall') {
+        ['mt', 'mr', 'mb', 'ml'].forEach(function (id) { $(id).value = el.value; });
+        $('mallv').textContent = el.value + ' mm';
+      }
+      if (el.id === 'wmop') $('wmopv').textContent = el.value + '%';
+      if (el.id === 'wmsize') $('wmsizev').textContent = el.value + '%';
+      if (el.name === 'wmpos') {
+        $('wmsize').value = WM_DEFAULT_SIZE[el.value];
+        $('wmsizev').textContent = WM_DEFAULT_SIZE[el.value] + '%';
+      }
+      if (el.id === 'wmfile') return;
+      update();
+    });
+    el.addEventListener('change', update);
+  });
+  document.querySelectorAll('[data-sample]').forEach(function (b) {
+    b.addEventListener('click', function () { apply(SAMPLES[b.dataset.sample]); update(); });
+  });
+  $('dl').addEventListener('click', download);
+  $('wmfile').addEventListener('change', function () { wmLoad(this.files && this.files[0]); });
+  $('wmclear').addEventListener('click', wmClear);
+
+  // Alinea las líneas seleccionadas (o la línea del cursor) con una marca al inicio: [c] centro, [d] derecha.
+  function alignSel(kind) {
+    var ta = $('body'), v = ta.value, s = ta.selectionStart, e = ta.selectionEnd;
+    var a = s === 0 ? 0 : v.lastIndexOf('\n', s - 1) + 1;
+    var end = e > s && v.charAt(e - 1) === '\n' ? e - 1 : e;
+    var z = v.indexOf('\n', end);
+    if (z < 0) z = v.length;
+    var out = v.slice(a, z).split('\n').map(function (l) {
+      var t = l.replace(/^\[[cdi]\]\s?/, '');
+      if (!t.trim()) return l;
+      if (/^\s*([-*•]|\d+[.)])\s+/.test(t) || /^\s*(-{3,}|={3,})\s*$/.test(t)) return l;
+      return kind === 'i' ? t : '[' + kind + '] ' + t;
+    }).join('\n');
+    ta.value = v.slice(0, a) + out + v.slice(z);
+    ta.focus();
+    ta.setSelectionRange(a, a + out.length);
+    update();
+  }
+  document.querySelectorAll('[data-align]').forEach(function (b) {
+    b.addEventListener('click', function () { alignSel(b.dataset.align); });
+  });
+
+  if (window.ResizeObserver) {
+    var lastW = 0;
+    new ResizeObserver(function () {
+      var w = $('pages').clientWidth;
+      if (w !== lastW) { lastW = w; renderPreview(); }
+    }).observe($('pages'));
+  }
+
+  // Dentro de Claude la descarga pasa por su confirmación; en cualquier otra web se usa la descarga normal del navegador.
+  function browserDownloads() {
+    return {
+      save: function (req) {
+        return new Promise(function (resolve, reject) {
+          try {
+            var url = URL.createObjectURL(new Blob([req.data], { type: 'application/pdf' }));
+            var a = document.createElement('a');
+            if ('download' in a) {
+              a.href = url; a.download = req.filename;
+              a.style.display = 'none';
+              document.body.appendChild(a); a.click(); a.remove();
+            } else {
+              window.open(url, '_blank');
+            }
+            setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+            resolve({ status: 'saved' });
+          } catch (e) { reject(e); }
+        });
+      }
+    };
+  }
+  downloads = undefined;
+  var useP = inViewer ? window.claude.use('downloads') : Promise.resolve(browserDownloads());
+  Promise.resolve(useP).then(function (d) { downloads = d || null; refreshAction(); }, function () { downloads = null; refreshAction(); });
+
+  if (!jsPDFCtor) {
+    $('pages').textContent = 'No se pudo cargar el generador de PDF. Recarga la página.';
+  }
+  update();
+})();
+</script>
+
+</body>
+</html>
